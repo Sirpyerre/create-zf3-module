@@ -33,7 +33,7 @@ class Command extends SymfonyCommand
     ];
 
     protected $files =[
-        '/'=>'Module',
+        'src'=>'Module',
         'config' => '/module.config',
     ];
 
