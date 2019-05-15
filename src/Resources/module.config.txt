@@ -1,0 +1,7 @@
+<?php
+namespace __Application__;
+
+use Zend\Router\Http\Literal;
+use Zend\Router\Http\Segment;
+
+return [];

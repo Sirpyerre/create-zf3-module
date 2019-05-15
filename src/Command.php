@@ -1,0 +1,108 @@
+<?php
+
+namespace Console;
+
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+
+class Command extends SymfonyCommand
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    private $moduleName;
+    private $pathToApplication;
+
+    protected $structModule = [
+        'config',
+        'src/Controller',
+        'src/Controller/Factory',
+        'src/Entity',
+        'src/Repository',
+        'src/Form',
+        'src/Form/Factory',
+        'src/Service',
+        'src/Service/Factory',
+        'view'
+    ];
+
+    protected $files =[
+        '/'=>'Module',
+        'config' => '/module.config',
+    ];
+
+    protected function createModule(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln(['Crear un nuevo modulo:']);
+
+        $this->moduleName = $input->getArgument('moduleName');
+        $this->pathToApplication = $input->getArgument('pathToApplication');
+
+        $this->createStructure($this->structModule);
+
+        $this->createFiles();
+
+    }
+
+    public function createStructure($structure)
+    {
+        $currentDir = $this->pathToApplication.'/module';
+        foreach ($structure as $key => $dir) {
+            $path = $currentDir . '/'.$this->moduleName.'/'.$dir;
+
+            if (!file_exists($path)) {
+                echo "path: $path\n";
+                mkdir($path, 0777, true);
+            }
+        }
+    }
+
+    public function createFiles()
+    {
+        $currentDir = __DIR__;
+        $destinationPath = $this->pathToApplication.'/module';
+
+        foreach ($this->files as $directory => $file) {
+            $path = "$destinationPath/$this->moduleName";
+
+            if ($directory == '/'){
+                $path .= "/";
+            } else {
+                $path .= "/$directory/";
+            }
+
+            $path .= "$file.php";
+            if(!file_exists($path)){
+                echo 'file:'. $path."\n";
+//                touch($path);
+                $template = file_get_contents("$currentDir/Resources/$file.txt");
+                $template = str_replace('__Application__', $this->moduleName, $template);
+                file_put_contents($path,$template);
+
+            }
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getModuleName()
+    {
+        return $this->moduleName;
+    }
+
+    /**
+     * @param mixed $moduleName
+     */
+    public function setModuleName($moduleName)
+    {
+        $this->moduleName = $moduleName;
+    }
+
+}
