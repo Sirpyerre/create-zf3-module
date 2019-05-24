@@ -32,29 +32,42 @@ class Command extends SymfonyCommand
         'view'
     ];
 
-    protected $files =[
-        'src'=>'Module',
-        'config' => '/module.config',
+    protected $files = [
+        'src' => 'Module',
+        'config' => 'module.config',
+        'src/Controller' => 'IndexController',
+        'src/Controller/Factory' => 'IndexControllerFactory',
+        'view' => 'index'
     ];
 
     protected function createModule(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln(['Crear un nuevo modulo:']);
+        $output->writeln(['Create a new module:']);
 
         $this->moduleName = $input->getArgument('moduleName');
         $this->pathToApplication = $input->getArgument('pathToApplication');
 
-        $this->createStructure($this->structModule);
+        $this->createStructure();
 
         $this->createFiles();
 
+        $output->writeln(["\n\nNext steps: \n\t1.- Add to array in modules.config, the new module. 
+        2.- Edit composer.json\n\t3.- In a terminal: composer dump-autoload.\n"]);
+
     }
 
-    public function createStructure($structure)
+    public function createStructure()
     {
-        $currentDir = $this->pathToApplication.'/module';
-        foreach ($structure as $key => $dir) {
-            $path = $currentDir . '/'.$this->moduleName.'/'.$dir;
+        $structure = $this->structModule;
+        $currentDir = $this->pathToApplication . '/module';
+        foreach ($structure as $dir) {
+
+            if ($dir === 'view') {
+                $dir = "view/" . strtolower($this->moduleName) . '/index/';
+            }
+
+            $path = $currentDir . '/' . $this->moduleName . '/' . $dir;
+
 
             if (!file_exists($path)) {
                 echo "path: $path\n";
@@ -66,24 +79,20 @@ class Command extends SymfonyCommand
     public function createFiles()
     {
         $currentDir = __DIR__;
-        $destinationPath = $this->pathToApplication.'/module';
+        $destinationPath = $this->pathToApplication . '/module';
 
         foreach ($this->files as $directory => $file) {
             $path = "$destinationPath/$this->moduleName";
 
-            if ($directory == '/'){
-                $path .= "/";
-            } else {
-                $path .= "/$directory/";
-            }
+            $path .= $this->FixDirectory($directory);
 
             $path .= "$file.php";
-            if(!file_exists($path)){
-                echo 'file:'. $path."\n";
+            if (!file_exists($path)) {
+                echo 'file:' . $path . "\n";
 //                touch($path);
                 $template = file_get_contents("$currentDir/Resources/$file.txt");
                 $template = str_replace('__Application__', $this->moduleName, $template);
-                file_put_contents($path,$template);
+                file_put_contents($path, $template);
 
             }
         }
@@ -103,6 +112,23 @@ class Command extends SymfonyCommand
     public function setModuleName($moduleName)
     {
         $this->moduleName = $moduleName;
+    }
+
+    public function FixDirectory($directory)
+    {
+        $path = '/';
+        $moduleName = strtolower($this->moduleName);
+        echo "\nModule:" . $moduleName . ", directory: $directory\n";
+        switch ($directory) {
+            case '/':
+                return $path;
+            case 'view':
+                $path = '/view/' . $moduleName . '/index/';
+                return $path;
+            default:
+                return "/$directory/";
+
+        }
     }
 
 }

@@ -1,0 +1,18 @@
+<?php
+
+
+namespace __Application__\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
+class IndexController extends AbstractActionController
+{
+
+    protected $entityManager;
+
+    public function indexAction()
+    {
+        return new ViewModel();
+    }
+
+}

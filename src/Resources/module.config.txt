@@ -3,17 +3,28 @@ namespace __Application__;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
+use __Application__\Controller\IndexController;
+use __Application__\Factory\IndexControllerFactory;
 
 return [
     'router' => [
         'routes' => [
-
+             'home' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/',
+                    'defaults' => [
+                        'controller' => IndexController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+             ],
         ],
     ],
 
     'controllers' => [
         'factories' => [
-
+            IndexController::class => IndexControllerFactory::class
         ]
     ],
     'service_manager' => [
