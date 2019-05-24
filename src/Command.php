@@ -51,8 +51,10 @@ class Command extends SymfonyCommand
 
         $this->createFiles();
 
-        $output->writeln(["\n\nNext steps: \n\t1.- Add to array in modules.config, the new module. 
-        2.- Edit composer.json\n\t3.- In a terminal: composer dump-autoload.\n"]);
+        $output->writeln(["\n\nNext steps: \n
+        1.- Add to array in modules.config.php, the new module. 
+        2.- Edit composer.json and add \"{$this->moduleName}\\\\\": \"module/{$this->moduleName}/src/\", in autoload \n
+        3.- In a terminal: composer dump-autoload.\n"]);
 
     }
 
@@ -63,7 +65,7 @@ class Command extends SymfonyCommand
         foreach ($structure as $dir) {
 
             if ($dir === 'view') {
-                $dir = "view/" . strtolower($this->moduleName) . '/index/';
+                $dir = "view/" . $this->ViewDirectoryNormalize() . '/index/';
             }
 
             $path = $currentDir . '/' . $this->moduleName . '/' . $dir;
@@ -84,9 +86,14 @@ class Command extends SymfonyCommand
         foreach ($this->files as $directory => $file) {
             $path = "$destinationPath/$this->moduleName";
 
-            $path .= $this->FixDirectory($directory);
+            $path .= $this->FixViewDirectory($directory);
 
-            $path .= "$file.php";
+            if ($file === 'index'){
+                $path .= "$file.phtml";
+            } else {
+                $path .= "$file.php";
+            }
+
             if (!file_exists($path)) {
                 echo 'file:' . $path . "\n";
 //                touch($path);
@@ -114,11 +121,11 @@ class Command extends SymfonyCommand
         $this->moduleName = $moduleName;
     }
 
-    public function FixDirectory($directory)
+    private function FixViewDirectory($directory)
     {
         $path = '/';
-        $moduleName = strtolower($this->moduleName);
-        echo "\nModule:" . $moduleName . ", directory: $directory\n";
+        $moduleName = $this->ViewDirectoryNormalize();
+
         switch ($directory) {
             case '/':
                 return $path;
@@ -129,6 +136,15 @@ class Command extends SymfonyCommand
                 return "/$directory/";
 
         }
+    }
+
+    private function ViewDirectoryNormalize()
+    {
+        $this->moduleName;
+        $moduleNameSplit = preg_split('#([A-Z][^A-Z]*)#', $this->moduleName, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $wordsToLower = array_map('strtolower', $moduleNameSplit);
+
+        return implode('-', $wordsToLower);
     }
 
 }
