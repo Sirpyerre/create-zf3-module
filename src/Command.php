@@ -65,7 +65,7 @@ class Command extends SymfonyCommand
         foreach ($structure as $dir) {
 
             if ($dir === 'view') {
-                $dir = "view/" . $this->ViewDirectoryNormalize() . '/index/';
+                $dir = "view/" . $this->ViewDirectoryToSlugify() . '/index/';
             }
 
             $path = $currentDir . '/' . $this->moduleName . '/' . $dir;
@@ -124,7 +124,7 @@ class Command extends SymfonyCommand
     private function FixViewDirectory($directory)
     {
         $path = '/';
-        $moduleName = $this->ViewDirectoryNormalize();
+        $moduleName = $this->ViewDirectoryToSlugify();
 
         switch ($directory) {
             case '/':
@@ -138,7 +138,10 @@ class Command extends SymfonyCommand
         }
     }
 
-    private function ViewDirectoryNormalize()
+    /*
+     * Slugify ModuleName
+    */
+    private function ViewDirectoryToSlugify()
     {
         $this->moduleName;
         $moduleNameSplit = preg_split('#([A-Z][^A-Z]*)#', $this->moduleName, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
