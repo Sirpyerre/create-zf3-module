@@ -143,7 +143,6 @@ class Command extends SymfonyCommand
     */
     private function ViewDirectoryToSlugify()
     {
-        $this->moduleName;
         $moduleNameSplit = preg_split('#([A-Z][^A-Z]*)#', $this->moduleName, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         $wordsToLower = array_map('strtolower', $moduleNameSplit);
 
